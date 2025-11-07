@@ -44,6 +44,7 @@ AS BEGIN TRY
 		,@TimeZone NVARCHAR(50)
 		,@UTCDateTime datetime2(3)
 
+		-- join to security.CoExternalCoAssoc unnecessary after ExternalCompanyId added to Company table
 		select 
 			@ProductEventId = pe.ProductEventId
 			,@TimeZone = isnull(c.timezone,'Pacific Standard Time')

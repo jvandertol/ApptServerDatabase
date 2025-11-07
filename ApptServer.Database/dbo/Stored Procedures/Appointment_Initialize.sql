@@ -18,6 +18,8 @@ BEGIN
 	create table #tmp (
 		CompanyId				bigint,
 		Name			varchar(100),
+		ARD				varchar(25),
+		CAAutoServiceLicenseFlag bit,
 		Street1			varchar(200),
 		Street2			varchar(25),
 		City			varchar(200),
@@ -27,15 +29,19 @@ BEGIN
 		PrimaryEmail	varchar(100),
 		ApptPolicy		varchar(3000),
 		IsDeleted		bit,
+		BusinessType    varchar(100),
 		UTCCreateDtTm	datetime2(3),
 		UTCUpdateDtTm	datetime2(3),
 	)
 
-	insert into #tmp exec companies_get @CompanyId
+	insert into #tmp 
+	exec companies_get @CompanyId
 
 	select 
 		CompanyId				
 		,Name			ShopName	
+		,ARD
+		,CAAutoServiceLicenseFlag
 		,Street1		
 		,Street2			
 		,City			ShopCityName

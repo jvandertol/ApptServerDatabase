@@ -39,7 +39,9 @@ AS BEGIN TRY
 
 	-- if externalpackageid is populated, check in table to see if package exist in assoc table
 	if(@ExternalPackageId is not null) begin
+-- schedule.PkgCoAssoc table exists because the ExternalPackageId column does not exist in the schedule.Packages table and it should.  The query would still exist but it would go against the schedule.Packages  table
 		select @PackageId = PackageId from schedule.PkgCoAssoc where ExternalPackageId = @ExternalPackageId
+-- security.CoExternalCoAssoc table exists because the ExternalCompanyId column does not exist in the Company table and it should.  The query would still exist but it would go against the company table
 		select @CompanyId = CompanyId from security.CoExternalCoAssoc where ExternalCompanyId = @ExternalCompanyId
 
 	end
@@ -57,6 +59,7 @@ AS BEGIN TRY
 		)
 		select @PackageId = SCOPE_IDENTITY()
 
+		-- once ExternalPackageId is added to schedule.Packages this insert is not needed
 		insert into schedule.PkgCoAssoc 
 			(PackageId,ExternalPackageId,CreateDtTm,CreateById)
 		values
