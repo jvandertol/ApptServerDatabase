@@ -1,0 +1,25 @@
+﻿CREATE TABLE [schedule].[ProductEventDOW] (
+    [ProductEventDOWID]         BIGINT        IDENTITY (1, 1) NOT NULL,
+    [ProductEventId]            BIGINT        NOT NULL,
+    [ExternalProductEventDOWID] BIGINT        NULL,
+    [DOW]                       INT           NOT NULL,
+    [ProductEventStartDt]       DATE          NULL,
+    [UTCProductEventStartDt]    DATE          NULL,
+    [ProductEventEndDt]         DATE          NULL,
+    [UTCProductEventEndDt]      DATE          NULL,
+    [ScheduledStartingTime]     TIME (7)      NULL,
+    [UTCScheduledStartingTime]  TIME (7)      NULL,
+    [ScheduledEndingTime]       TIME (7)      NULL,
+    [UTCScheduledEndingTime]    TIME (7)      NULL,
+    [DaysOffSet]                INT           NULL,
+    [CreateDtTm]                DATETIME2 (7) NULL,
+    [CreatedById]               BIGINT        NULL,
+    [UpdateDtTm]                DATETIME2 (7) NULL,
+    [UpdatedById]               BIGINT        NULL,
+    [UTCCreateDtTm]             DATETIME2 (7) NULL,
+    [UTCUpdateDtTm]             DATETIME2 (7) NULL,
+    [DOWeventTypeId]            INT           NULL,
+    [DOWeventDescr]             VARCHAR (200) NULL,
+    CONSTRAINT [PK_ProductEventDOW_1] PRIMARY KEY CLUSTERED ([ProductEventDOWID] ASC)
+);
+

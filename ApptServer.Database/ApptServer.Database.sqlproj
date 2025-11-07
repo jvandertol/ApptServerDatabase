@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>ApptServer</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{9093682d-5711-4f69-afbb-646a1f07f60f}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>ApptServer</RootNamespace>
+    <AssemblyName>ApptServer</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Tables\" />
+    <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="security\" />
+    <Folder Include="security\Tables\" />
+    <Folder Include="security\Stored Procedures\" />
+    <Folder Include="schedule\" />
+    <Folder Include="schedule\Tables\" />
+    <Folder Include="attribs\" />
+    <Folder Include="attribs\Tables\" />
+    <Folder Include="search\" />
+    <Folder Include="search\Tables\" />
+    <Folder Include="metadata\" />
+    <Folder Include="metadata\Tables\" />
+    <Folder Include="schedule\Stored Procedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
+    <Build Include="dbo\Tables\Logs.sql" />
+    <Build Include="dbo\Tables\Messages.sql" />
+    <Build Include="dbo\Tables\RoleClaims.sql" />
+    <Build Include="dbo\Tables\Roles.sql" />
+    <Build Include="dbo\Tables\UserClaims.sql" />
+    <Build Include="dbo\Tables\UserLogins.sql" />
+    <Build Include="dbo\Tables\UserRoles.sql" />
+    <Build Include="dbo\Tables\Users.sql" />
+    <Build Include="dbo\Tables\UserTokens.sql" />
+    <Build Include="dbo\Tables\Companies.sql" />
+    <Build Include="dbo\Stored Procedures\Companies_Search.sql" />
+    <Build Include="dbo\Stored Procedures\Companies_Get.sql" />
+    <Build Include="dbo\Stored Procedures\Companies_Set.sql" />
+    <Build Include="dbo\Stored Procedures\Companies_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\Companies_Search_OLD.sql" />
+    <Build Include="dbo\Stored Procedures\Users_Set.sql" />
+    <Build Include="dbo\Stored Procedures\Users_Search.sql" />
+    <Build Include="dbo\Tables\RefreshTokens.sql" />
+    <Build Include="dbo\Stored Procedures\RefreshTokens_Set.sql" />
+    <Build Include="dbo\Stored Procedures\Users_Get.sql" />
+    <Build Include="dbo\Stored Procedures\RefreshTokens_Get.sql" />
+    <Build Include="security\Tables\Roles.sql" />
+    <Build Include="security\Tables\UserRolesAssoc.sql" />
+    <Build Include="security\Stored Procedures\GetUserPermissions.sql" />
+    <Build Include="security\security.sql" />
+    <Build Include="security\Tables\AllowedURLs.sql" />
+    <Build Include="security\Stored Procedures\AllowedUrls_Search.sql" />
+    <Build Include="security\apptApplication.sql" />
+    <Build Include="security\apptUserUS.sql" />
+    <Build Include="schedule\Tables\ServiceTypePkgAssoc.sql" />
+    <Build Include="schedule\Tables\ProductEvent.sql" />
+    <Build Include="schedule\Tables\ServiceTypes.sql" />
+    <Build Include="schedule\Tables\ProductEventDOW.sql" />
+    <Build Include="schedule\Tables\DOWEventType.sql" />
+    <Build Include="schedule\Tables\Package.sql" />
+    <Build Include="security\schedule.sql" />
+    <Build Include="dbo\Stored Procedures\Appointment_Initialize.sql" />
+    <Build Include="schedule\Tables\VehTypeCoAssoc.sql" />
+    <Build Include="schedule\Tables\VehicleTypes.sql" />
+    <Build Include="schedule\Tables\FuelTypes.sql" />
+    <Build Include="schedule\Tables\FuelTypeCoAssoc.sql" />
+    <Build Include="schedule\Tables\YearTypes.sql" />
+    <Build Include="schedule\Tables\YearTypeCoAssoc.sql" />
+    <Build Include="dbo\Stored Procedures\Appointment_Schedule.sql" />
+    <Build Include="dbo\Tables\TempPassword.sql" />
+    <Build Include="dbo\Tables\ApptStatus.sql" />
+    <Build Include="dbo\Tables\Appointments.sql" />
+    <Build Include="security\Tables\TwoFactorCode.sql" />
+    <Build Include="security\Tables\CompanyUserAssoc.sql" />
+    <Build Include="security\Stored Procedures\Create2FACode.sql" />
+    <Build Include="security\Stored Procedures\Check2FACode.sql" />
+    <Build Include="dbo\Stored Procedures\AutoServiceAppointment_Set.sql" />
+    <Build Include="dbo\Tables\ContactMethodPurpose.sql" />
+    <Build Include="dbo\Tables\CompanyContactMethods.sql" />
+    <Build Include="dbo\Stored Procedures\AutoServiceAppointment_Get.sql" />
+    <Build Include="security\Tables\SecurityLevel.sql" />
+    <Build Include="security\Tables\PermissionAssoc.sql" />
+    <Build Include="security\Tables\Permission.sql" />
+    <Build Include="security\Tables\FunctionalArea.sql" />
+    <Build Include="security\Tables\Field.sql" />
+    <Build Include="security\Tables\Domain.sql" />
+    <Build Include="security\Tables\ClaimType.sql" />
+    <Build Include="security\Stored Procedures\ActionPermissions_Search.sql" />
+    <Build Include="attribs\Tables\AutoServiceApptAttrib.sql" />
+    <Build Include="attribs\Tables\AutoServiceAttributes.sql" />
+    <Build Include="security\attribs.sql" />
+    <Build Include="search\Tables\CASearchAttribute.sql" />
+    <Build Include="security\search.sql" />
+    <Build Include="dbo\Stored Procedures\CAAutoServiceShop_Set.sql" />
+    <Build Include="security\Tables\RolePermissionsAssoc.sql" />
+    <Build Include="security\Stored Procedures\User_GetRoles.sql" />
+    <Build Include="attribs\Tables\AutoSvcPkgAttribAssoc.sql" />
+    <Build Include="metadata\Tables\PkgAttributes.sql" />
+    <Build Include="security\metadata.sql" />
+    <Build Include="schedule\Tables\PkgCoAssoc.sql" />
+    <Build Include="schedule\Stored Procedures\UpSertPackage_Set.sql" />
+    <Build Include="schedule\Stored Procedures\Package_List.sql" />
+    <Build Include="schedule\Stored Procedures\ProductEventDOW_Delete.sql" />
+    <Build Include="security\Tables\CoExternalCoAssoc.sql" />
+    <Build Include="schedule\Stored Procedures\ProductEventDOW_Set.sql" />
+    <Build Include="dbo\Stored Procedures\CAAutoServiceShop_Get.sql" />
+    <Build Include="dbo\Stored Procedures\BaseCompany_Get.sql" />
+    <Build Include="dbo\Stored Procedures\CAAutoServiceShop_Search.sql" />
+    <Build Include="dbo\Stored Procedures\BaseCompany_Search.sql" />
+  </ItemGroup>
+</Project>
