@@ -65,7 +65,7 @@ AS BEGIN
 				(
 					select UserId,ar.CompanyId from security.CompanyUserAssoc ca 
 						join security.AllowedURLs ar on ca.CompanyId = ar.CompanyId
-						where ar.Url = @Origin
+						where ar.Url = isnull(@Origin,'-1')
 							and ca.isPrimary = 1
 				) cas on u.UserId = cas.UserId
 				where 
@@ -108,7 +108,7 @@ AS BEGIN
 					(
 					select UserId,ar.CompanyId from security.CompanyUserAssoc ca 
 							join security.AllowedURLs ar on ca.CompanyId = ar.CompanyId 
-							where ar.Url = @Origin
+						where ar.Url = isnull(@Origin,'-1')
 								and ca.isPrimary = 1
 					) cas on u.UserId = cas.UserId
 				where 
