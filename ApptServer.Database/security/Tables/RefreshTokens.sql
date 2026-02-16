@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[RefreshTokens] (
+﻿CREATE TABLE [security].[RefreshTokens] (
     [UserId]       BIGINT        NOT NULL,
     [RefreshToken] VARCHAR (MAX) NOT NULL,
     [IssuedAt]     DATETIME2 (3) NOT NULL,

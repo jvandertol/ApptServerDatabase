@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Users_Get]
+﻿CREATE PROCEDURE [security].[Users_Get]
     @Id bigint 
 AS
 BEGIN TRY
@@ -17,30 +17,23 @@ BEGIN TRY
 			,u.Region
 			,u.PoCode
 			,u.CreatedAt
-			,u.UserName
-			,u.NormalizedUserName
-			,u.Email
-			,u.NormalizedEmail
-			,u.EmailConfirmed
-			,u.PasswordHash
-			,u.SecurityStamp
-			,u.ConcurrencyStamp
-			,u.PhoneNumber
-			,u.PhoneNumberConfirmed
-			,u.TwoFactorEnabled
-			,u.LockoutEnd
-			,u.LockoutEnabled
-			,u.AccessFailedCount
-			,u.IsDeleted		
+			,cua.UserName
+			,cua.Email
+			,cua.EmailConfirmed
+			,cua.PasswordHash
+			,cua.PhoneNumber
+			,cua.PhoneNumberConfirmed
+			,cua.TwoFactorEnabled
+			,cua.LockoutEnd
+			,cua.LockoutEnabled
+			,cua.AccessFailedCount
+			,cua.IsDeleted		
 			,cua.Companyid 
-		from users	u 
+		from security.users	u 
 			join security.CompanyUserAssoc cua on u.UserId = cua.UserId	
-		WHERE u.UserId = @Id;
+		WHERE cua.CompanyUserAssocId = @Id;
   
-  select * from INFORMATION_SCHEMA.COLUMNS where TABLE_NAME = 'users'
-
 		select @@ROWCOUNT 
-
 
 END TRY
 BEGIN CATCH

@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[TempPassword] (
+﻿CREATE TABLE [security].[TempPassword] (
     [TempPasswordId] INT           IDENTITY (1, 1) NOT NULL,
     [Password]       VARCHAR (10)  NOT NULL,
     [ExpiryDtTm]     DATETIME2 (3) NOT NULL,

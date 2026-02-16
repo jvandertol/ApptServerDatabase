@@ -26,7 +26,7 @@ select @ResultCode
 
 
 
-select * from users
+select * from security.users
 */
 
 AS BEGIN TRY
@@ -57,23 +57,23 @@ AS BEGIN TRY
 	-- does the user exist
 	if @AuthContactMethodId = 1 begin -- phone
 
-		select @UserId = u.UserId from Users u 
+		select @UserId = u.UserId from security.Users u 
 			join security.CompanyUserAssoc cua on u.UserId = u.UserId and cua.Companyid = @Companyid
-		where u.PhoneNumber = @AuthContactValue 
+		where cua.PhoneNumber = @AuthContactValue 
 	end
 	else begin
-		--select @UserId = u.UserId from Users u 
+		--select @UserId = u.UserId from security.Users u 
 		--	join security.CompanyUserAssoc cua on u.UserId = cua.UserId and cua.Companyid = @Companyid
 		--	where Email = @AuthContactValue 
 		declare @namesmatch bit
-		select @UserId = u.UserId, @namesmatch= isnull(u2.UserId, 0)  from Users u 
+		select @UserId = u.UserId, @namesmatch= isnull(u2.UserId, 0)  from security.Users u 
 					join security.CompanyUserAssoc cua on u.UserId = cua.UserId and cua.Companyid = 1
 					left join 
 					(
-					select userid from users u1 where u1.FirstName = @FirstName and u1.LastName = @LastName
+					select userid from security.users u1 where u1.FirstName = @FirstName and u1.LastName = @LastName
 
 					) u2 on u.UserId = u2.UserId
-		where Email = @AuthContactValue
+		where cua.Email = @AuthContactValue
 	end
 
 	-- valid email, different names
@@ -91,7 +91,7 @@ AS BEGIN TRY
 		--end
 
 		-- if there is a refresh token revoke it, if none found this will do nothing
-		update RefreshTokens 
+		update security.RefreshTokens 
 			set IsRevoked =1
 			,RevokedAt = GETUTCDATE()
 		where 

@@ -1,19 +1,19 @@
-﻿
-CREATE PROCEDURE [security].[ActionPermissions_Search]
+﻿create PROCEDURE [security].[ActionPermissions_Search_Safe]
 @PageNumber int = 0,
 @PageId bigint = 1, 
 @Forward bit = 1,
 @PageSize int =20,
 @MaxPages int =3,
---@FullList bit = 1,
+@FullList bit = 1,
+@DomainKey varchar(50) = NULL,
 @Roles security.RoleList READONLY
 
 AS BEGIN
 /*
 declare @r1 security.RoleList
-insert into @r1 values ('ADMIN')
+insert into @r1 values ('SysAdminAPI')
 
-exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
+exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,'pkg',@r1
 
 */
 
@@ -29,9 +29,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
 		select 
 		pa.PermissionAssocId Id
 		,ct.ClaimTypeKey
-		,r.RoleName
-		,d.DomainName
-		,concat(d.DomainKey,':',f.fieldname,case when f.FieldName is null then '' else ':' end,p.PermissionKey) ClaimValue
+		,concat(d.DomainKey,':',f.fieldname,case when f.FieldName is null then '' else ':' end,p.PermissionKey) RequiredClaimValue
 	from security.PermissionAssoc pa
 		join security.RolePermissionsAssoc rpa on pa.PermissionAssocId = rpa.PermissionAssocId
 		join security.Roles r on rpa.RoleId = r.RoleId
@@ -39,6 +37,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
 		join security.Permission p on pa.PermissionId = p.PermissionId
 		join security.ClaimType ct on pa.ClaimTypeId = ct.ClaimTypeId
 		left join security.field f on pa.fieldid = f.FieldId
-	where r.RoleName IN (SELECT RoleName FROM @Roles);
+	where d.DomainKey = @DomainKey
+		AND r.RoleName IN (SELECT RoleName FROM @Roles);
 
 END

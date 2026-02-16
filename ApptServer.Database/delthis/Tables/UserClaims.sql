@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[UserClaims] (
+﻿CREATE TABLE [delthis].[UserClaims] (
     [Id]         INT           IDENTITY (1, 1) NOT NULL,
     [UserId]     BIGINT        NOT NULL,
     [ClaimType]  VARCHAR (MAX) NULL,
@@ -7,9 +7,7 @@
 );
 
 
-
-
 GO
 CREATE NONCLUSTERED INDEX [IX_UserClaims_UserId]
-    ON [dbo].[UserClaims]([UserId] ASC);
+    ON [delthis].[UserClaims]([UserId] ASC);
 

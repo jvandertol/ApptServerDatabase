@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[RefreshTokens_Get]
+﻿CREATE PROCEDURE [security].[RefreshTokens_Get]
     @Id bigint 
 AS
 BEGIN TRY
@@ -7,7 +7,7 @@ BEGIN TRY
 
 	SET NOCOUNT ON;
 
-		select * from RefreshTokens	WHERE UserId = @Id;
+		select * from security.RefreshTokens	WHERE UserId = @Id;
   
 		select @@ROWCOUNT 
 

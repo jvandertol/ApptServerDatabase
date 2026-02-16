@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[UserTokens] (
+﻿CREATE TABLE [delthis].[UserTokens] (
     [UserId]        BIGINT        NOT NULL,
     [LoginProvider] VARCHAR (450) NOT NULL,
     [Name]          VARCHAR (450) NOT NULL,

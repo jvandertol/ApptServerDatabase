@@ -30,7 +30,7 @@ exec [security].[Check2FACode] '654322','123x@boo.com', 2,'https://localhost:517
 select @ResultCode
 
 
-select * from users
+select * from secuirty.users
 */
 
 AS BEGIN TRY

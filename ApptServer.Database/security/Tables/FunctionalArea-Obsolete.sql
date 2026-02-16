@@ -1,4 +1,4 @@
-﻿CREATE TABLE [security].[FunctionalArea] (
+﻿CREATE TABLE [security].[FunctionalArea-Obsolete] (
     [FunctionalAreaId]   INT           IDENTITY (1, 1) NOT NULL,
     [FunctionalAreaKey]  VARCHAR (50)  NOT NULL,
     [FunctionalAreaName] VARCHAR (100) NOT NULL,

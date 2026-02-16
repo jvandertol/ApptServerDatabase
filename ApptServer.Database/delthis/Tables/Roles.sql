@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Roles] (
+﻿CREATE TABLE [delthis].[Roles] (
     [Id]               BIGINT        NOT NULL,
     [Name]             VARCHAR (256) NULL,
     [NormalizedName]   VARCHAR (256) NULL,
@@ -7,9 +7,7 @@
 );
 
 
-
-
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [RoleNameIndex]
-    ON [dbo].[Roles]([NormalizedName] ASC) WHERE ([NormalizedName] IS NOT NULL);
+    ON [delthis].[Roles]([NormalizedName] ASC) WHERE ([NormalizedName] IS NOT NULL);
 

@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[RefreshTokens_Set]
+﻿CREATE PROCEDURE [security].[RefreshTokens_Set]
     @UserId bigint 
     ,@RefreshToken varchar(max) 
     ,@IssuedAt datetime2(3) 
@@ -12,7 +12,7 @@ BEGIN TRY
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	UPDATE RefreshTokens
+	UPDATE security.RefreshTokens
 			SET
 				RefreshToken = CASE 
 								WHEN @RefreshToken IS NOT NULL THEN @RefreshToken 
@@ -32,7 +32,7 @@ BEGIN TRY
   
 	if (@@ROWCOUNT = 0 ) begin
 
-		insert into RefreshTokens
+		insert into security.RefreshTokens
 		select 
 			@UserId			
 			,@RefreshToken		

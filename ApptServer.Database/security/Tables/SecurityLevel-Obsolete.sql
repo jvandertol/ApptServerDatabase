@@ -1,4 +1,4 @@
-﻿CREATE TABLE [security].[SecurityLevel] (
+﻿CREATE TABLE [security].[SecurityLevel-Obsolete] (
     [SecurityLevelId]        INT           IDENTITY (1, 1) NOT NULL,
     [SecurityLevelName]      VARCHAR (100) NOT NULL,
     [RequiresAuthentication] BIT           NOT NULL,

@@ -20,8 +20,8 @@ BEGIN TRY
 		,a.ApptStatusId
 		,u.FirstName CustFirstName
 		,u.LastName CustLastName
-		,u.Email ApptUserEmail
-		,u.PhoneNumber ApptUserPhone
+		,cua.Email ApptUserEmail
+		,cua.PhoneNumber ApptUserPhone
 		,p.PackageId
 		,p.PackageName
 		,p.Price
@@ -45,9 +45,9 @@ BEGIN TRY
 		join schedule.FuelTypes ft on aat.FuelTypeCd = ft.FuelTypeCd
 		join schedule.VehicleTypes vt on aat.VehicleTypeCd = vt.VehicleTypeCd
 		join schedule.Package p on a.PackageId = p.PackageId
-		join users u on a.UserId = u.UserId
-		join Companies c on a.CompanyId = c.CompanyId
-	where a.AppointmentId = @Id
+		join security.CompanyUserAssoc cua on a.Userid = cua.CompanyUserAssocId
+		join security.users u on cua.UserId = u.UserId
+		join Companies c on a.CompanyId = c.CompanyId	where a.AppointmentId = @Id
 
 END TRY
 BEGIN CATCH

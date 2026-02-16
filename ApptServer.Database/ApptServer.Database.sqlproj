@@ -73,30 +73,24 @@
     <Folder Include="metadata\" />
     <Folder Include="metadata\Tables\" />
     <Folder Include="schedule\Stored Procedures\" />
+    <Folder Include="Company\" />
+    <Folder Include="Company\Tables\" />
+    <Folder Include="security\Views\" />
+    <Folder Include="security\User Defined Types\" />
+    <Folder Include="delthis\" />
+    <Folder Include="delthis\Tables\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
     <Build Include="dbo\Tables\Logs.sql" />
     <Build Include="dbo\Tables\Messages.sql" />
-    <Build Include="dbo\Tables\RoleClaims.sql" />
-    <Build Include="dbo\Tables\Roles.sql" />
-    <Build Include="dbo\Tables\UserClaims.sql" />
     <Build Include="dbo\Tables\UserLogins.sql" />
-    <Build Include="dbo\Tables\UserRoles.sql" />
-    <Build Include="dbo\Tables\Users.sql" />
-    <Build Include="dbo\Tables\UserTokens.sql" />
     <Build Include="dbo\Tables\Companies.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Search.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Get.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Set.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Delete.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Search_OLD.sql" />
-    <Build Include="dbo\Stored Procedures\Users_Set.sql" />
-    <Build Include="dbo\Stored Procedures\Users_Search.sql" />
-    <Build Include="dbo\Tables\RefreshTokens.sql" />
-    <Build Include="dbo\Stored Procedures\RefreshTokens_Set.sql" />
-    <Build Include="dbo\Stored Procedures\Users_Get.sql" />
-    <Build Include="dbo\Stored Procedures\RefreshTokens_Get.sql" />
     <Build Include="security\Tables\Roles.sql" />
     <Build Include="security\Tables\UserRolesAssoc.sql" />
     <Build Include="security\Stored Procedures\GetUserPermissions.sql" />
@@ -120,7 +114,6 @@
     <Build Include="schedule\Tables\YearTypes.sql" />
     <Build Include="schedule\Tables\YearTypeCoAssoc.sql" />
     <Build Include="dbo\Stored Procedures\Appointment_Schedule.sql" />
-    <Build Include="dbo\Tables\TempPassword.sql" />
     <Build Include="dbo\Tables\ApptStatus.sql" />
     <Build Include="dbo\Tables\Appointments.sql" />
     <Build Include="security\Tables\TwoFactorCode.sql" />
@@ -131,10 +124,8 @@
     <Build Include="dbo\Tables\ContactMethodPurpose.sql" />
     <Build Include="dbo\Tables\CompanyContactMethods.sql" />
     <Build Include="dbo\Stored Procedures\AutoServiceAppointment_Get.sql" />
-    <Build Include="security\Tables\SecurityLevel.sql" />
     <Build Include="security\Tables\PermissionAssoc.sql" />
     <Build Include="security\Tables\Permission.sql" />
-    <Build Include="security\Tables\FunctionalArea.sql" />
     <Build Include="security\Tables\Field.sql" />
     <Build Include="security\Tables\Domain.sql" />
     <Build Include="security\Tables\ClaimType.sql" />
@@ -160,5 +151,30 @@
     <Build Include="dbo\Stored Procedures\BaseCompany_Get.sql" />
     <Build Include="dbo\Stored Procedures\CAAutoServiceShop_Search.sql" />
     <Build Include="dbo\Stored Procedures\BaseCompany_Search.sql" />
+    <Build Include="security\Tables\SecurityLevel-Obsolete.sql" />
+    <Build Include="security\Tables\FunctionalArea-Obsolete.sql" />
+    <Build Include="Company\Tables\LocationOptionAssoc.sql" />
+    <Build Include="Company\Tables\OptionType.sql" />
+    <Build Include="Company\Tables\Options.sql" />
+    <Build Include="security\Views\vw_RoleDomainPermissions.sql" />
+    <Build Include="security\Views\vw_DomainPermissions.sql" />
+    <Build Include="security\Stored Procedures\ActionPermissions_Search_Safe.sql" />
+    <Build Include="security\User Defined Types\RoleList.sql" />
+    <Build Include="security\Company.sql" />
+    <Build Include="security\Tables\Users.sql" />
+    <Build Include="security\Tables\TempPassword.sql" />
+    <Build Include="security\Tables\RefreshTokens.sql" />
+    <Build Include="Company\Tables\OptionRightsAssoc.sql" />
+    <Build Include="delthis\Tables\UserRoles.sql" />
+    <Build Include="delthis\Tables\RoleClaims.sql" />
+    <Build Include="delthis\Tables\Roles.sql" />
+    <Build Include="delthis\Tables\UserClaims.sql" />
+    <Build Include="delthis\Tables\UserTokens.sql" />
+    <Build Include="security\Stored Procedures\Users_Set.sql" />
+    <Build Include="security\Stored Procedures\Users_Search.sql" />
+    <Build Include="security\Stored Procedures\Users_Get.sql" />
+    <Build Include="security\Stored Procedures\RefreshTokens_Set.sql" />
+    <Build Include="security\Stored Procedures\RefreshTokens_Get.sql" />
+    <Build Include="security\delthis.sql" />
   </ItemGroup>
 </Project>

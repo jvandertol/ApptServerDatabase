@@ -1,4 +1,4 @@
-﻿CREATE PROCEDURE [dbo].[Users_Set]
+﻿CREATE PROCEDURE [security].[Users_Set]
 	@UserId	bigint	= NULL
 	,@FirstName	varchar(250)= NULL
 	,@LastName	varchar(250)= NULL
@@ -23,6 +23,8 @@
 	,@AccessFailedCount	int	= NULL
 	,@IsDeleted bit = 0
 	,@Origin varchar(200)
+	,@RoleName varchar(50)
+	,@CompanyId bigint NULL
 AS
 BEGIN TRY
 
@@ -40,13 +42,13 @@ BEGIN TRY
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	declare @CompanyId bigint
-
-	select @CompanyId = CompanyId from security.AllowedURLs where url = @Origin
+	if @CompanyId is null begin
+		select @CompanyId = CompanyId from security.AllowedURLs where url = @Origin
+	end
 
 	if(@UserId is null) begin
 		-- Insert statements for procedure here
-		INSERT INTO [dbo].[users] (
+		INSERT INTO [security].[users] (
 			FirstName, LastName, [Address], [Address2], [City], [Region], [PoCode], CreatedAt,
 			UserName, Email, EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp, PhoneNumber,
 			PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount, IsDeleted
@@ -89,7 +91,7 @@ BEGIN TRY
 				@ConcurrencyStamp AS ConcurrencyStamp,
 				@MobilePhone AS PhoneNumber
 		) AS v
-		LEFT JOIN [dbo].[users] u
+		LEFT JOIN [security].[users] u
 			ON u.Email = @Email OR (u.PhoneNumber = @MobilePhone and @MobilePhone is not null)
 		WHERE u.UserId IS NULL;
 
@@ -101,12 +103,12 @@ BEGIN TRY
 			THROW 50001, 'SQLERROR-50001 - Insert failed: a user with this email or phone number already exists.', 1;
 		END
 
-		insert into security.CompanyUserAssoc values (@UserId, @CompanyId)
+		insert into security.CompanyUserAssoc values (@UserId, @CompanyId,1)
 
 	end
 	else begin
     -- Insert statements for procedure here
-		update [dbo].[users] set
+		update [security].[users] set
 			 FirstName			= case when @FirstName is null then FirstName else @FirstName end
 			,LastName			= case when @LastName is null then LastName else @LastName end
 			,[Address]			= case when @Address is null then Address else @Address end
