@@ -1,7 +1,7 @@
 ﻿-- =============================================
 -- Author:		<Author,,Name>
 -- Create date: <Create Date,,>
--- Description:	OBSOLETE NOT USED - DELETE - PERMISSIONS ARE BASED ON ROLES This returns all the permissions for a specific user.  It is used to show user permissions to manage them.  These are not in the JWT
+-- Description:	Returns all the permissions for a specific user.  It is used to show user permissions to manage them.  These are not in the JWT
 -- =============================================
 CREATE PROCEDURE [security].[GetUserPermissions]
 	@Id bigint
@@ -26,6 +26,6 @@ BEGIN
 		join security.RolePermissionsAssoc rpa on pa.PermissionAssocId = rpa.PermissionAssocId
 		join security.UserRolesAssoc ura on rpa.RoleId = ura.RoleId
 		left join security.field f on pa.fieldid = f.FieldId
-	where ura.UserId = @Id
+	where ura.CompanyUserAssocId = @Id
 
 END

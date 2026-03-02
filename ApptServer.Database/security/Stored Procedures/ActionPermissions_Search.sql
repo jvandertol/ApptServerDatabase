@@ -5,15 +5,15 @@ CREATE PROCEDURE [security].[ActionPermissions_Search]
 @Forward bit = 1,
 @PageSize int =20,
 @MaxPages int =3,
---@FullList bit = 1,
+@CompanyId bigint,
 @Roles security.RoleList READONLY
 
 AS BEGIN
 /*
 declare @r1 security.RoleList
-insert into @r1 values ('ADMIN')
+insert into @r1 values ('CUSTOMER')
 
-exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
+exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
 
 */
 
@@ -28,6 +28,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
 
 		select 
 		pa.PermissionAssocId Id
+		,ISNULL(ora.PermissionScopeId, 1) Scope
 		,ct.ClaimTypeKey
 		,r.RoleName
 		,d.DomainName
@@ -39,6 +40,29 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,@r1
 		join security.Permission p on pa.PermissionId = p.PermissionId
 		join security.ClaimType ct on pa.ClaimTypeId = ct.ClaimTypeId
 		left join security.field f on pa.fieldid = f.FieldId
-	where r.RoleName IN (SELECT RoleName FROM @Roles);
+		left join security.OptionRightsAssoc ora
+        on ora.PermissionAssocId = pa.PermissionAssocId
+			and ora.PermissionScopeId in (1,2)
+	where 
+		r.RoleName IN (SELECT RoleName FROM @Roles)
+	AND
+        (
+            -- permission is NOT feature-gated
+            pa.IsOptionControlled = 0
+
+            OR
+
+            -- permission is feature-gated AND company has an option that enables it
+             EXISTS (
+                SELECT 1
+                FROM Company.LocationOptionAssoc loa
+                    JOIN security.OptionRightsAssoc ora
+                        ON loa.OptionId = ora.OptionId
+                WHERE
+                    loa.CompanyId = @CompanyId
+                    AND ora.PermissionAssocId = pa.PermissionAssocId
+            )
+        );
+		
 
 END

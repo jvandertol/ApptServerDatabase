@@ -3,6 +3,7 @@
 
 
 
+
 CREATE VIEW [security].[vw_DomainPermissions]
 AS
 SELECT
@@ -25,6 +26,7 @@ SELECT
         CASE WHEN f.FieldName IS NULL THEN '' ELSE ':' END,
         p.PermissionKey
     ) AS RequiredClaimValue
+    ,pa.IsOptionControlled
 FROM security.PermissionAssoc pa
 JOIN security.Domain d ON pa.DomainId = d.DomainId
 JOIN security.Permission p ON pa.PermissionId = p.PermissionId

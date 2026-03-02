@@ -164,7 +164,6 @@
     <Build Include="security\Tables\Users.sql" />
     <Build Include="security\Tables\TempPassword.sql" />
     <Build Include="security\Tables\RefreshTokens.sql" />
-    <Build Include="Company\Tables\OptionRightsAssoc.sql" />
     <Build Include="delthis\Tables\UserRoles.sql" />
     <Build Include="delthis\Tables\RoleClaims.sql" />
     <Build Include="delthis\Tables\Roles.sql" />
@@ -176,5 +175,8 @@
     <Build Include="security\Stored Procedures\RefreshTokens_Set.sql" />
     <Build Include="security\Stored Procedures\RefreshTokens_Get.sql" />
     <Build Include="security\delthis.sql" />
+    <Build Include="security\Tables\PermissionsScope.sql" />
+    <Build Include="security\Tables\OptionRightsAssoc.sql" />
+    <Build Include="security\Views\vw_RoleDomainPermissions_TEST.sql" />
   </ItemGroup>
 </Project>

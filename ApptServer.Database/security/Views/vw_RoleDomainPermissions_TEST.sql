@@ -4,7 +4,7 @@
 
 
 
-CREATE VIEW [security].[vw_RoleDomainPermissions]
+CREATE VIEW [security].[vw_RoleDomainPermissions_TEST]
 AS
 SELECT
     pa.PermissionAssocId AS Id,
