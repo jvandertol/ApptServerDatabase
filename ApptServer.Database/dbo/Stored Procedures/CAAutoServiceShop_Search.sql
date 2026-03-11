@@ -4,7 +4,14 @@
 @Forward bit = 1,
 @PageSize int =20,
 @MaxPages int =3,
-@CompanyName varchar(200) = NULL
+@Name varchar(200) = NULL
+--@Street1 varchar(50) = null,
+--@City varchar(50) = null,
+--@state varchar(50) = null,
+--@PoCode varchar(50) = null,
+--@PrimaryPhone varchar(50) = null,
+--@PrimaryEmail varchar(50) = null,
+--@BusinessType varchar(25)
 
 AS BEGIN
 /*
@@ -96,7 +103,7 @@ Commented on 2025-03-20 as the parameter is defaulted to 1, so this code should 
 			join attribs.AutoServiceAttributes asa on c.CompanyId = asa.CompanyId
 				where 
 				c.CompanyId >= @PageId
-				and (CompanyName like '%' + @CompanyName + '%' or @CompanyName is null);
+				and (CompanyName like '%' + @Name + '%' or @Name is null);
 		end
 		else begin
 			insert into #tmpC
@@ -105,7 +112,7 @@ Commented on 2025-03-20 as the parameter is defaulted to 1, so this code should 
 			from companies 
 				where 
 				CompanyId <= @PageId
-				and (CompanyName like '%' + @CompanyName + '%' or @CompanyName is null);
+				and (CompanyName like '%' + @Name + '%' or @Name is null);
 		end
 		;
 		

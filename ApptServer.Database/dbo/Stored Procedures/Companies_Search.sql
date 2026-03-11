@@ -4,7 +4,13 @@
 @Forward bit = 1,
 @PageSize int =20,
 @MaxPages int =3,
-@CompanyName varchar(200) = NULL,
+@Name varchar(200) = NULL,
+@Street1 varchar(50) = null,
+@City varchar(50) = null,
+@state varchar(50) = null,
+@PoCode varchar(50) = null,
+@PrimaryPhone varchar(50) = null,
+@PrimaryEmail varchar(50) = null,
 @BusinessType varchar(25)
 
 
@@ -18,7 +24,7 @@ AS BEGIN
 	SET NOCOUNT ON;
 
 	IF @BusinessType = 'caautoserviceshop'
-		EXEC CAAutoServiceShop_Search @PageNumber, @PageId, @Forward, @PageSize, @MaxPages,@CompanyName
+		EXEC CAAutoServiceShop_Search @PageNumber, @PageId, @Forward, @PageSize, @MaxPages,@Name
 	ELSE
-		EXEC BaseCompany_Search  @PageNumber, @PageId, @Forward, @PageSize, @MaxPages,@CompanyName
+		EXEC BaseCompany_Search  @PageNumber, @PageId, @Forward, @PageSize, @MaxPages,@Name
 END

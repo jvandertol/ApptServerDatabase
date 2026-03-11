@@ -24,8 +24,9 @@
 	,@IsDeleted bit = 0
 	,@Origin varchar(200)
 	,@RoleName varchar(50)
-	,@CompanyId bigint NULL
+	,@CompanyId bigint NULL = NULL
 AS
+BEGIN
 BEGIN TRY
 
 /*
@@ -37,6 +38,7 @@ BEGIN TRY
 */
 
 	declare @updated bit = 0
+	,@ActualUserId bigint
 
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
@@ -49,9 +51,7 @@ BEGIN TRY
 	if(@UserId is null) begin
 		-- Insert statements for procedure here
 		INSERT INTO [security].[users] (
-			FirstName, LastName, [Address], [Address2], [City], [Region], [PoCode], CreatedAt,
-			UserName, Email, EmailConfirmed, PasswordHash, SecurityStamp, ConcurrencyStamp, PhoneNumber,
-			PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount, IsDeleted
+			FirstName, LastName, [Address], [Address2], [City], [Region], [PoCode], CreatedAt, IsDeleted
 		)
 		SELECT
 			v.FirstName,
@@ -62,18 +62,6 @@ BEGIN TRY
 			v.Region,
 			v.PoCode,
 			GETUTCDATE(),
-			ISNULL(v.UserName, v.Email),
-			v.Email,
-			0,
-			v.Password,
-			v.SecurityStamp,
-			v.ConcurrencyStamp,
-			v.PhoneNumber,
-			0,
-			0,
-			NULL,
-			0,
-			0,
 			0
 		FROM (
 			SELECT
@@ -83,32 +71,49 @@ BEGIN TRY
 				@Address2 AS Address2,
 				@City AS City,
 				@Region AS Region,
-				@PoCode AS PoCode,
-				@UserName AS UserName,
-				@Email AS Email,
-				@Password AS Password,
-				@SecurityStamp AS SecurityStamp,
-				@ConcurrencyStamp AS ConcurrencyStamp,
-				@MobilePhone AS PhoneNumber
+				@PoCode AS PoCode
 		) AS v
 		LEFT JOIN [security].[users] u
-			ON u.Email = @Email OR (u.PhoneNumber = @MobilePhone and @MobilePhone is not null)
+		LEFT JOIN security.CompanyUserAssoc cua on u.UserId = cua.UserId
+			ON cua.CompanyId = @CompanyId and cua.Email = @Email OR (cua.PhoneNumber = @MobilePhone and @MobilePhone is not null)
 		WHERE u.UserId IS NULL;
 
 
-		select @UserId = SCOPE_IDENTITY()
-
-		IF @UserId IS NULL
+		--select @UserId = SCOPE_IDENTITY()
+		select @ActualUserId = SCOPE_IDENTITY()
+		IF @ActualUserId IS NULL
 		BEGIN
 			THROW 50001, 'SQLERROR-50001 - Insert failed: a user with this email or phone number already exists.', 1;
 		END
 
-		insert into security.CompanyUserAssoc values (@UserId, @CompanyId,1)
+		insert into security.CompanyUserAssoc values (
+			@ActualUserId 
+			,@CompanyId
+			,1 
+			,case when @UserName is null then @Email end
+			,@Email
+			,@EmailConfirmed
+			,@Password
+			,@MobilePhone
+			,@PhoneNumberConfirmed
+			,@TwoFactorEnabled
+			,@LockoutEnd
+			,@LockoutEnabled
+			,@AccessFailedCount
+			,@IsDeleted
+		)
+
+		select @UserId = SCOPE_IDENTITY()
+
+		-- add role
+		insert into security.UserRolesAssoc
+		  select roleid, @Userid from security.Roles where RoleName = @RoleName
 
 	end
 	else begin
     -- Insert statements for procedure here
-		update [security].[users] set
+		update u
+		set
 			 FirstName			= case when @FirstName is null then FirstName else @FirstName end
 			,LastName			= case when @LastName is null then LastName else @LastName end
 			,[Address]			= case when @Address is null then Address else @Address end
@@ -116,24 +121,27 @@ BEGIN TRY
 			,City				= case when @City is null then City else @City end
 			,Region				= case when @Region is null then Region else @Region end
 			,PoCode				= case when @PoCode is null then PoCode else @PoCode end
-			,Email				= case when @Email is null then Email else @Email end
-			,EmailConfirmed		= case when @EmailConfirmed is null then EmailConfirmed else @EmailConfirmed end	
-			,PasswordHash		= case when @Password is null then PasswordHash else @Password end
-			,SecurityStamp		= case when @SecurityStamp is null then SecurityStamp else @SecurityStamp end
-			,ConcurrencyStamp	= case when @ConcurrencyStamp is null then ConcurrencyStamp else @ConcurrencyStamp end
-			,PhoneNumber		= case when @MobilePhone is null then PhoneNumber else @MobilePhone end
-			,PhoneNumberConfirmed= case when @PhoneNumberConfirmed is null then PhoneNumberConfirmed else @PhoneNumberConfirmed end
-			,TwoFactorEnabled	= case when @TwoFactorEnabled is null then TwoFactorEnabled else @TwoFactorEnabled end
-			,LockoutEnd			= case when @LockoutEnd is null then LockoutEnd else @LockoutEnd end
-			,LockoutEnabled		= case when @LockoutEnabled is null then LockoutEnabled else @LockoutEnabled end
-			,AccessFailedCount  = case when @AccessFailedCount is null then AccessFailedCount else @AccessFailedCount end
-			,IsDeleted			= case when @IsDeleted is null then IsDeleted else @IsDeleted end
-		where UserId = @UserId
+			,IsDeleted			= case when @IsDeleted is null then u.IsDeleted else @IsDeleted end
+		from security.users u
+			join security.companyuserassoc cua on u.UserId = cua.UserId
+		where cua.CompanyUserAssocId = @UserId
 		
 		IF @@ROWCOUNT = 0
 		BEGIN
 			THROW 50002, 'SQLERROR-50002 - Update failed: no user found with the specified UserId.', 1;
 		END
+
+		update security.companyuserassoc
+		set
+			CompanyId					= @CompanyId		
+			,IsPrimary					= 1
+			,PasswordHash				= @Password
+			,TwoFactorEnabled 			= case when @TwoFactorEnabled is null then TwoFactorEnabled else @TwoFactorEnabled end
+			,LockoutEnd 				= case when @LockoutEnd is null then LockoutEnd else @LockoutEnd end
+			,LockoutEnabled				= case when @LockoutEnabled is null then LockoutEnabled else @LockoutEnabled end
+			,AccessFailedCount			= case when @AccessFailedCount is null then AccessFailedCount else @AccessFailedCount end
+			,IsDeleted					= case when @IsDeleted is null then IsDeleted else @IsDeleted end
+		where CompanyUserAssocId = @UserId
 
 	end
 
@@ -160,3 +168,4 @@ BEGIN CATCH
     -- Log the error or raise it
     RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
 END CATCH
+END

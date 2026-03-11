@@ -6,13 +6,13 @@
     [UserName]             VARCHAR (256) NOT NULL,
     [Email]                VARCHAR (256) NULL,
     [EmailConfirmed]       BIT           NULL,
-    [PasswordHash]         VARCHAR (MAX) NOT NULL,
+    [PasswordHash]         VARCHAR (MAX) NULL,
     [PhoneNumber]          VARCHAR (20)  NULL,
     [PhoneNumberConfirmed] BIT           NULL,
-    [TwoFactorEnabled]     BIT           NOT NULL,
+    [TwoFactorEnabled]     BIT           NULL,
     [LockoutEnd]           DATETIME2 (3) NULL,
-    [LockoutEnabled]       BIT           NOT NULL,
-    [AccessFailedCount]    INT           NOT NULL,
+    [LockoutEnabled]       BIT           NULL,
+    [AccessFailedCount]    INT           NULL,
     [IsDeleted]            BIT           NOT NULL,
     CONSTRAINT [PK_CompanyUserAssoc] PRIMARY KEY CLUSTERED ([CompanyUserAssocId] ASC)
 );
