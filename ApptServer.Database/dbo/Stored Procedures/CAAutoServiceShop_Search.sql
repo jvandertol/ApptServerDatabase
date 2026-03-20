@@ -4,7 +4,8 @@
 @Forward bit = 1,
 @PageSize int =20,
 @MaxPages int =3,
-@Name varchar(200) = NULL
+@Name varchar(200) = NULL,
+@BusinessType varchar(25)
 --@Street1 varchar(50) = null,
 --@City varchar(50) = null,
 --@state varchar(50) = null,

@@ -86,11 +86,9 @@
     <Build Include="dbo\Tables\Messages.sql" />
     <Build Include="dbo\Tables\UserLogins.sql" />
     <Build Include="dbo\Tables\Companies.sql" />
-    <Build Include="dbo\Stored Procedures\Companies_Search.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Get.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Set.sql" />
     <Build Include="dbo\Stored Procedures\Companies_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\Companies_Search_OLD.sql" />
     <Build Include="security\Tables\Roles.sql" />
     <Build Include="security\Tables\UserRolesAssoc.sql" />
     <Build Include="security\Stored Procedures\GetUserPermissions.sql" />

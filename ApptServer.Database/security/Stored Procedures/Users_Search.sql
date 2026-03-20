@@ -21,13 +21,14 @@
 ,@IsDeleted bit = 0
 ,@Origin varchar(200) = null
 ,@CompanyId bigint = null
+,@AllowedCaller varchar(15) = null
 
 AS BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	if(@Origin is null and @CompanyId is null)
+	if(@Origin is null and @CompanyId is null and @AllowedCaller is null)
 		THROW 50002, 'Origin or CompanyId is required.', 1;
 
 	CREATE TABLE #tmpU (
@@ -81,6 +82,11 @@ AS BEGIN
 							 )
 						 )
 					  )
+				  OR (
+						@AllowedCaller = 'escwebservice'
+						AND ca.CompanyId = -1
+				  )
+
 				) cas on u.UserId = cas.u2
 				where 
 					u.UserId >= @PageId and
@@ -132,6 +138,10 @@ AS BEGIN
 							 )
 						 )
 					  )
+					  OR (
+						@AllowedCaller = 'escwebservice'
+						AND ca.CompanyId = -1
+					)
 				) cas on u.UserId = cas.u2
 				where 
 					u.UserId < @PageId and
