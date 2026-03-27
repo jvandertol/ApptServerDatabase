@@ -5,8 +5,8 @@
 -- =============================================
 CREATE PROCEDURE [dbo].[Appointment_Schedule] 
 	-- Add the parameters for the stored procedure here
-	@Id bigint null -- CompanyId
-	,@Origin varchar(250) null
+	@Id bigint = null -- CompanyId
+	,@Origin varchar(250) = null
 	,@PackageId bigint
 	,@StartDate date
 AS
@@ -35,7 +35,7 @@ declare
 	end
 	    
 	if @id is null or @PackageId is null or @StartDate IS NULL begin
-		RAISERROR('id is required',11,1,@CallingProcedure )
+		RAISERROR('CompanyId or Origin is required',11,1,@CallingProcedure )
 	end
 
 
@@ -69,6 +69,16 @@ declare
 		OPTION (MAXRECURSION 0)
 
 	--select * from #tmpApp
+	
+	-- remove holidays
+	DELETE t
+	FROM #tmpApp t
+	WHERE EXISTS (
+		SELECT 1
+		FROM schedule.ProductEventDOW pdow
+		WHERE pdow.ProductEventStartDt = t.myDate
+		  AND pdow.DOWeventTypeId = 4
+	);
 
 	--select ProductEventStartDt ClosedDay from  idbtest4.ProductEvent pe 
 	--	join schedule.ProductEventDOW  dow on pe.ProductEventID = dow.ProductEventID 
