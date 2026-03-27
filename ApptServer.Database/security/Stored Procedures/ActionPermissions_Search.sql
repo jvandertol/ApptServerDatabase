@@ -1,4 +1,17 @@
-﻿
+﻿-- =============================================
+-- Author:			JTV
+-- Create date:		2026-03-27
+-- Description:		returns a list of claims in the form of:
+-- Scope:			(either 1 or 2) for Actor or Company enumeration
+-- ClaimTypeKey:	such as acc-perm of fld-perm
+-- RoleName:		Customer, Admin, etc
+-- DomainName:		Domain the claim operates on
+-- ClaimValue:		Combination of short domain:claim value
+-- Description:		The claim value is referenced by the object code where permissions are required.  if the claimvalue is found the action is allowed.
+--					The scope is used to identify who the claim is acting on.  1 = Actor or the current user, 2 is a company level claim.  This permission is granted
+--					when a company has selected a particular option or feature as part of their account subscription
+-- =============================================
+
 CREATE PROCEDURE [security].[ActionPermissions_Search]
 @PageNumber int = 0,
 @PageId bigint = 1, 
