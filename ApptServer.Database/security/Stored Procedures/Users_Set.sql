@@ -25,6 +25,7 @@
 	,@Origin varchar(200)
 	,@RoleName varchar(50)
 	,@CompanyId bigint NULL = NULL
+	,@AllowedCaller varchar(25) = NULL
 AS
 BEGIN
 BEGIN TRY
