@@ -74,6 +74,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
                 WHERE
                     loa.CompanyId = @CompanyId
                     AND ora.PermissionAssocId = pa.PermissionAssocId
+					AND pa.IsOptionControlled = 1
             )
         );
 		

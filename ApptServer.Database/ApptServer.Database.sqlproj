@@ -149,8 +149,6 @@
     <Build Include="dbo\Stored Procedures\BaseCompany_Get.sql" />
     <Build Include="dbo\Stored Procedures\CAAutoServiceShop_Search.sql" />
     <Build Include="dbo\Stored Procedures\BaseCompany_Search.sql" />
-    <Build Include="security\Tables\SecurityLevel-Obsolete.sql" />
-    <Build Include="security\Tables\FunctionalArea-Obsolete.sql" />
     <Build Include="Company\Tables\LocationOptionAssoc.sql" />
     <Build Include="Company\Tables\OptionType.sql" />
     <Build Include="Company\Tables\Options.sql" />
@@ -176,5 +174,6 @@
     <Build Include="security\Tables\PermissionsScope.sql" />
     <Build Include="security\Tables\OptionRightsAssoc.sql" />
     <Build Include="security\Views\vw_RoleDomainPermissions_TEST.sql" />
+    <Build Include="dbo\Stored Procedures\CompanyOptions_Set.sql" />
   </ItemGroup>
 </Project>
