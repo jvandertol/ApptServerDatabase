@@ -44,7 +44,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
 		,ISNULL(ora.PermissionScopeId, 1) Scope
 		,ct.ClaimTypeKey
 		,r.RoleName
-		,d.DomainName
+		,d.DomainKey
 		,concat(d.DomainKey,':',f.fieldname,case when f.FieldName is null then '' else ':' end,p.PermissionKey) ClaimValue
 	from security.PermissionAssoc pa
 		join security.RolePermissionsAssoc rpa on pa.PermissionAssocId = rpa.PermissionAssocId

@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [Company].[Options] (
     [Id]                       INT            IDENTITY (1, 1) NOT NULL,
     [OptionName]               VARCHAR (150)  NOT NULL,
+    [OptionCd]                 VARCHAR (15)   NULL,
     [OptionDescription]        VARCHAR (2000) NULL,
     [IndustryId]               INT            NULL,
-    [ExternalOptionId]         INT            NULL,
     [PropertyXml]              XML            NULL,
     [OptionTypeId]             INT            NULL,
     [Cost]                     MONEY          NULL,

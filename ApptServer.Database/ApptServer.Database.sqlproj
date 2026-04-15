@@ -79,6 +79,7 @@
     <Folder Include="security\User Defined Types\" />
     <Folder Include="delthis\" />
     <Folder Include="delthis\Tables\" />
+    <Folder Include="Company\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
@@ -175,5 +176,7 @@
     <Build Include="security\Tables\OptionRightsAssoc.sql" />
     <Build Include="security\Views\vw_RoleDomainPermissions_TEST.sql" />
     <Build Include="dbo\Stored Procedures\CompanyOptions_Set.sql" />
+    <Build Include="Company\Tables\LocationOptionAssocLog.sql" />
+    <Build Include="Company\Stored Procedures\CompanyOptionAssignment_Set.sql" />
   </ItemGroup>
 </Project>
