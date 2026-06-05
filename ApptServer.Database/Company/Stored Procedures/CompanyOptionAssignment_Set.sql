@@ -1,19 +1,20 @@
 ﻿-- =============================================
 -- Author:		jtv
 -- Create date: 2026-0-08
--- Description:	sets or removes an option and its parent.  The option is in OptionCd and GroupCd is the parent.  These are passed or
--- derived from the @Id if that is passed.  The sp inserts the current values where the row OptionCd = @OptionCd or the optionCd = @GroupCd
+-- Description:	sets or removes an option.  The option is in OptionCd or the passed ID.
+-- The sp inserts the current values where the row OptionCd = @OptionCd
 -- 
 -- =============================================
 CREATE PROCEDURE [Company].[CompanyOptionAssignment_Set]
 	@Id bigint null
 	,@OptionCd varchar(15) null
-	,@GroupCd varchar(15) null
 	,@EffectiveDate Date null
 	,@IsEnabled bit
 	,@CompanyId bigint null
 	,@ExternalCompanyId bigint null
     ,@UserId bigint
+    ,@ApptUrl varchar(255) = null
+
 AS BEGIN
 /*
 -- IsEnabled = 0
@@ -40,7 +41,7 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
             THROW 50005, 'Invalid ExternalCompanyId', 1;
         END
     END
-    
+
     -- debug
 --    select @CompanyId,@OptionCd,@id
 
@@ -78,11 +79,6 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
          from Company.LocationOptionAssoc loa 
        where loa.id = @TargetId
     
-    -- delete
-    delete
-    from Company.LocationOptionAssoc  
-       where id = @TargetId
-    
 -- now if IsEnabled insert
     if(@IsEnabled= 1) begin
         insert into company.LocationOptionAssoc
@@ -99,5 +95,23 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
         from Company.Options o
         where optioncd = @optioncd 
 
+        if @ApptUrl is not null begin
+            IF exists (select 1 from security.AllowedURLs where [url] = @ApptUrl and CompanyId <> @CompanyId ) begin
+                THROW 50006, 'Url has been claimed by another company', 1;
+            end
+
+            delete from security.AllowedURLs where CompanyId = @CompanyId
+            -- add url to the allowed urls table - the url should not exist for multiple companies
+            insert into security.AllowedURLs ([Url],CompanyId,IsDeleted,CreateDtTm, CreatedById, UpdateDtTm, UpdatedById)
+                select @ApptUrl, @CompanyId,0,GETUTCDATE(),1,null,null 
+        end
+    end
+    else begin
+        -- delete
+        delete
+        from Company.LocationOptionAssoc  
+           where id = @TargetId
+
+        delete from security.AllowedURLs where [url] = @ApptUrl and CompanyId = @CompanyId
     end
 END
