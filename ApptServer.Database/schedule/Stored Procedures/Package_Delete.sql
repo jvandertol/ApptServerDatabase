@@ -3,24 +3,17 @@
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE [schedule].[UpSertPackage_Set]
+CREATE PROCEDURE [schedule].[Package_Delete]
 -- missing ExternalPackageId
 	@PackageId bigint = null
 	,@ExternalPackageId bigint = null
-	,@PackageName varchar(200) = null
-	,@SinglePriceFlag bit = null
-	,@CompanyId bigint = null
 	,@ExternalCompanyId bigint = null
-  	,@PackageXml varchar(max)
-  	,@EstDurationMins int = null
-  	,@ShowPriceOnline bit = 1
-	,@Price decimal(7,2)  = null
+	,@CompanyId bigint = null
 	-- Add the parameters for the stored procedure here
-AS BEGIN TRY
+AS BEGIN 
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
-	declare @isNewRow bit = 0
 	/*
 	-- EXAMPLES OF THROW
 	if exists(select 1 from search.CASearchAttribute where ARD = @ARD) begin
@@ -51,43 +44,60 @@ AS BEGIN TRY
 		THROW 52003, 'Unable to map external company', 1; 
 	end
 
-	if @PackageId is null begin
-		INSERT INTO schedule.Package
-		( PackageName,SinglePriceFlag,CompanyId,PackageXml,EstDurationMins,ShowPriceOnline,Price)
-		values (
-			 @PackageName,@SinglePriceFlag,@CompanyId,@PackageXml,@EstDurationMins,@ShowPriceOnline,@Price
+	if @PackageId is null or @CompanyId is null begin
+			THROW 52004, 'Unable to map PackageId or CompanyId', 1; 
+	end
+
+	delete from schedule.Package 
+	where PackageId = @PackageId and CompanyId = @CompanyId
+
+	-- remove assoc
+	if @ExternalPackageId is not null begin
+		delete from schedule.PkgCoAssoc  where ExternalPackageId = @ExternalPackageId --and ExternalCompanyId = @ExternalCompanyId
+	end
+
+
+	-- update vehicle type supported 
+	DELETE
+		FROM schedule.VehTypeCoAssoc
+		WHERE CompanyId = @CompanyId;
+
+	INSERT INTO schedule.VehTypeCoAssoc
+		(
+			CompanyId,
+			VehicleTypeId
 		)
-		select @PackageId = SCOPE_IDENTITY()
+		SELECT DISTINCT
+			P.CompanyId,
+			VT.VehicleTypeId
+		FROM schedule.Package P
+		CROSS APPLY P.PackageXml.nodes('/asonlinepkgcriteria/criterion') AS X(C)
+		INNER JOIN schedule.VehicleTypes VT
+			ON VT.VehicleTypeCd =
+			   X.C.value('@vehicletypecd', 'varchar(10)')
+		WHERE P.CompanyId = @CompanyId
+		  AND P.PackageXml IS NOT NULL;
 
-		-- once ExternalPackageId is added to schedule.Packages this insert is not needed
-		insert into schedule.PkgCoAssoc 
-			(PackageId,ExternalPackageId,CreateDtTm,CreateById)
-		values
-			(@PackageId,@ExternalPackageId,getutcdate(),1)
+	-- update fuel type supported 
+	DELETE
+		FROM schedule.FuelTypeCoAssoc
+		WHERE CompanyId = @CompanyId;
 
-	end
-	else begin
-		update schedule.Package
-			set
-				PackageName			= ISNULL(@PackageName,PackageName)
-				,SinglePriceFlag	= isnull(@SinglePriceFlag,SinglePriceFlag)
-				,PackageXml			= isnull(cast(@PackageXml as xml),PackageXml)
-				,EstDurationMins	= isnull(@EstDurationMins,EstDurationMins)
-				,ShowPriceOnline	= isnull(@ShowPriceOnline,ShowPriceOnline)
-				,Price				= isnull(@price,price)
-		where PackageId = @PackageId
-
-	end
+	INSERT INTO schedule.FuelTypeCoAssoc
+		(
+			CompanyId,
+			FuelTypeId
+		)
+		SELECT DISTINCT
+			P.CompanyId,
+			FT.FuelTypeId
+		FROM schedule.Package P
+		CROSS APPLY P.PackageXml.nodes('/asonlinepkgcriteria/criterion') AS X(C)
+		INNER JOIN schedule.FuelTypes FT
+			ON FT.FuelTypeCd =
+			   X.C.value('@fueltypecd', 'varchar(10)')
+		WHERE P.CompanyId = @CompanyId
+		  AND P.PackageXml IS NOT NULL;
 
 	SELECT @PackageId
-END TRY
-BEGIN CATCH
-        -- Optionally log error here
-    IF ERROR_NUMBER() IN (2601, 2627) BEGIN
-		DECLARE @errMsg nvarchar(4000) = ERROR_MESSAGE();
-        THROW 52001, 'A package with that name already exists.', 1;
-    END
-    ELSE BEGIN
-        THROW;
-    END
-END CATCH
+END

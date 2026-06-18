@@ -3,7 +3,7 @@
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-create PROCEDURE [schedule].[Package_List]
+CREATE PROCEDURE [schedule].[Package_List]
 	@Id bigint null
 	,@Origin varchar(250) null
 	,@YearGroupid int = 1
@@ -23,6 +23,7 @@ BEGIN
 	SELECT p.PackageId,PackageName,Price FROM schedule.Package p
 	WHERE 
 	p.CompanyId = @Id 
+	and p.isDeleted = 0
 	and PackageXml.exist('
 		/asonlinepkgcriteria/criterion[
 			@yeargroupid = sql:variable("@YearGroupId")

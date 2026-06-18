@@ -141,7 +141,6 @@
     <Build Include="metadata\Tables\PkgAttributes.sql" />
     <Build Include="security\metadata.sql" />
     <Build Include="schedule\Tables\PkgCoAssoc.sql" />
-    <Build Include="schedule\Stored Procedures\UpSertPackage_Set.sql" />
     <Build Include="schedule\Stored Procedures\Package_List.sql" />
     <Build Include="schedule\Stored Procedures\ProductEventDOW_Delete.sql" />
     <Build Include="security\Tables\CoExternalCoAssoc.sql" />
@@ -170,7 +169,6 @@
     <Build Include="security\Stored Procedures\Users_Search.sql" />
     <Build Include="security\Stored Procedures\Users_Get.sql" />
     <Build Include="security\Stored Procedures\RefreshTokens_Set.sql" />
-    <Build Include="security\Stored Procedures\RefreshTokens_Get.sql" />
     <Build Include="security\delthis.sql" />
     <Build Include="security\Tables\PermissionsScope.sql" />
     <Build Include="security\Tables\OptionRightsAssoc.sql" />
@@ -178,5 +176,9 @@
     <Build Include="dbo\Stored Procedures\CompanyOptions_Set.sql" />
     <Build Include="Company\Tables\LocationOptionAssocLog.sql" />
     <Build Include="Company\Stored Procedures\CompanyOptionAssignment_Set.sql" />
+    <Build Include="security\Stored Procedures\RefreshTokens_Search.sql" />
+    <Build Include="schedule\Stored Procedures\Package_SoftDelete.sql" />
+    <Build Include="schedule\Stored Procedures\Package_Set.sql" />
+    <Build Include="schedule\Stored Procedures\Package_Delete.sql" />
   </ItemGroup>
 </Project>

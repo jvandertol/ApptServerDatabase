@@ -103,7 +103,7 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
             delete from security.AllowedURLs where CompanyId = @CompanyId
             -- add url to the allowed urls table - the url should not exist for multiple companies
             insert into security.AllowedURLs ([Url],CompanyId,IsDeleted,CreateDtTm, CreatedById, UpdateDtTm, UpdatedById)
-                select @ApptUrl, @CompanyId,0,GETUTCDATE(),1,null,null 
+                select 'https://'+@ApptUrl, @CompanyId,0,GETUTCDATE(),1,null,null 
         end
     end
     else begin
