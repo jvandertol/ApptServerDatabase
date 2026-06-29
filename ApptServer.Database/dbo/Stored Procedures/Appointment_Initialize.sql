@@ -61,4 +61,13 @@ BEGIN
 	select ft.* from schedule.fuelTypes ft
 		join schedule.FuelTypeCoAssoc ftca on ft.FuelTypeId = ftca.FuelTypeId and ftca.CompanyId = @CompanyId
 
+	select distinct
+			C.Criteria.value('@fueltypecd', 'varchar(25)') as FuelTypeCd,
+			C.Criteria.value('@vehicletypecd', 'varchar(25)') as VehicleTypeCd
+		from schedule.Package p
+			cross apply p.PackageXml.nodes('/asonlinepkgcriteria/criterion') C(Criteria)
+		where p.CompanyId = 1
+			and p.IsDeleted = 0
+		order by FuelTypeCd, VehicleTypeCd
+
 END

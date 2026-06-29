@@ -1,5 +1,6 @@
 ﻿CREATE TABLE [Company].[LocationOptionAssocLog] (
-    [Id]               INT           NOT NULL,
+    [LogId]            BIGINT        IDENTITY (1, 1) NOT NULL,
+    [Id]               BIGINT        NOT NULL,
     [OptionId]         VARCHAR (150) NOT NULL,
     [CompanyId]        BIGINT        NOT NULL,
     [UTCEffectiveDate] DATETIME2 (0) NOT NULL,
@@ -8,7 +9,11 @@
     [UTCCreateDtTm]    DATETIME      NOT NULL,
     [CreateId]         BIGINT        NOT NULL,
     [UTCUpdateDtTm]    DATETIME      NULL,
-    [UpdateId]         BIGINT        NULL,
-    CONSTRAINT [PK_LocationOptionAssocLog] PRIMARY KEY CLUSTERED ([Id] ASC)
+    [UpdateId]         BIGINT        NULL
 );
+
+
+GO
+CREATE NONCLUSTERED INDEX [IX_LocationOptionAssocLog]
+    ON [Company].[LocationOptionAssocLog]([LogId] ASC);
 

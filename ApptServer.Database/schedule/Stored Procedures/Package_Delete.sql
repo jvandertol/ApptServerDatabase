@@ -44,8 +44,8 @@ AS BEGIN
 		THROW 52003, 'Unable to map external company', 1; 
 	end
 
-	if @PackageId is null or @CompanyId is null begin
-			THROW 52004, 'Unable to map PackageId or CompanyId', 1; 
+	if  @CompanyId is null begin
+			THROW 52004, 'Unable to map CompanyId', 1; 
 	end
 
 	delete from schedule.Package 
@@ -53,7 +53,7 @@ AS BEGIN
 
 	-- remove assoc
 	if @ExternalPackageId is not null begin
-		delete from schedule.PkgCoAssoc  where ExternalPackageId = @ExternalPackageId --and ExternalCompanyId = @ExternalCompanyId
+		delete from schedule.PkgCoAssoc  where ExternalPackageId = @ExternalPackageId and ExternalCompanyId = @ExternalCompanyId
 	end
 
 

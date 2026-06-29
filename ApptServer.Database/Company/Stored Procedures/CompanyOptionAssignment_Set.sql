@@ -27,11 +27,13 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	IF (@Id IS NULL AND @CompanyId IS NULL AND @ExternalCompanyId IS NULL) BEGIN
+    -- if id is populated rely on company id.  if id is null rely on external company id
+	IF ((@Id IS NOT NULL AND @CompanyId IS NULL) OR (@Id is NULL and @ExternalCompanyId IS NULL)) BEGIN
         THROW 50004, 'CompanyId or ExternalCompanyId is required if Id is null', 1;
     END
 
-    IF @CompanyId IS NULL AND @ExternalCompanyId IS NOT NULL BEGIN
+    -- give priority to external company.  
+    IF @ExternalCompanyId IS NOT NULL AND @Id is NULL BEGIN
         SELECT @CompanyId = CompanyId
         FROM security.CoExternalCoAssoc
         WHERE ExternalCompanyId = @ExternalCompanyId;
@@ -78,6 +80,9 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
         ,@UserId UpdateId
          from Company.LocationOptionAssoc loa 
        where loa.id = @TargetId
+
+    -- now delete original record
+    delete from company.LocationOptionAssoc  where Id = @TargetId
     
 -- now if IsEnabled insert
     if(@IsEnabled= 1) begin
@@ -95,7 +100,7 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
         from Company.Options o
         where optioncd = @optioncd 
 
-        if @ApptUrl is not null begin
+        --if @ApptUrl is not null begin
             IF exists (select 1 from security.AllowedURLs where [url] = @ApptUrl and CompanyId <> @CompanyId ) begin
                 THROW 50006, 'Url has been claimed by another company', 1;
             end
@@ -104,7 +109,7 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
             -- add url to the allowed urls table - the url should not exist for multiple companies
             insert into security.AllowedURLs ([Url],CompanyId,IsDeleted,CreateDtTm, CreatedById, UpdateDtTm, UpdatedById)
                 select 'https://'+@ApptUrl, @CompanyId,0,GETUTCDATE(),1,null,null 
-        end
+        --end
     end
     else begin
         -- delete
@@ -112,6 +117,6 @@ exec company.[CompanyOptionAssignment_Set] null,'appt_basic',null,1,null,431,2
         from Company.LocationOptionAssoc  
            where id = @TargetId
 
-        delete from security.AllowedURLs where [url] = @ApptUrl and CompanyId = @CompanyId
+        delete from security.AllowedURLs where CompanyId = @CompanyId
     end
 END

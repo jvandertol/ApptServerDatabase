@@ -62,9 +62,9 @@ AS BEGIN TRY
 
 		-- once ExternalPackageId is added to schedule.Packages this insert is not needed
 		insert into schedule.PkgCoAssoc 
-			(PackageId,ExternalPackageId,CreateDtTm,CreateById)
+			(PackageId,ExternalPackageId,ExternalCompanyId,CreateDtTm,CreateById)
 		values
-			(@PackageId,@ExternalPackageId,getutcdate(),1)
+			(@PackageId,@ExternalPackageId,@ExternalCompanyId, getutcdate(),1)
 
 	end
 	else begin

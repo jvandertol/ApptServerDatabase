@@ -7,9 +7,11 @@
     [EstDurationMins] INT           NULL,
     [ShowPriceOnline] BIT           NULL,
     [Price]           MONEY         NULL,
-    [IsDeleted]       BIGINT        NOT NULL,
+    [IsDeleted]       BIT           NOT NULL,
     CONSTRAINT [PK_Package] PRIMARY KEY CLUSTERED ([PackageId] ASC)
 );
+
+
 
 
 
