@@ -7,33 +7,51 @@ CREATE PROCEDURE [schedule].[ProductEventDOW_Delete]
 -- missing ExternalPackageId
 	@ProductEventDOWId bigint = null
 	,@ExternalProductEventDOWId bigint = null
+	,@CompanyId bigint = null
+	,@ExternalCompanyId bigint = null
+
 
 	-- Add the parameters for the stored procedure here
-AS BEGIN TRY
+AS BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
-	declare @Id bigint = isnull(@ProductEventDOWId,@ExternalProductEventDOWId)
-	,@DOWeventTypeId int = null
-	/*
-	-- EXAMPLES OF THROW
-	if exists(select 1 from search.CASearchAttribute where ARD = @ARD) begin
-			THROW 51001, 'DUPLICATE ARD', 1; 
-		end
+	declare @DOWeventTypeId int = null
 
-		if exists(select 1 from search.CASearchAttribute where CompanyName = @CompanyName and CityName = @City and PoCode = @PoCode) begin
-			THROW 51001, 'A COMPANY WITH THE SAME NAME CITY AND PO CODE EXISTS', 1; 
-		end
-	*/
+	if @ProductEventDOWID = -1
+		set @ProductEventDOWID = null
 
-	if @Id is null begin
-		THROW 52000, 'Either ProductEventDOWId or ExternalProductEventDOWId is required', 1; 
+	if @ExternalProductEventDOWId = -1
+		set @ExternalProductEventDOWId = null
+	
+	if @ProductEventDOWId is null AND (@ExternalProductEventDOWId IS NULL OR @ExternalCompanyId IS NULL ) begin
+		THROW 52250, 'Either ProductEventDOWId or ExternalProductEventDOWId and @ExternalCompanyId are required', 1; 
 
 	end
 
+	Declare	@msg varchar(250)
+	-- this is an external call get CompanyId
+	if @ExternalCompanyId is not null and @ProductEventDOWId is null begin
+		select @CompanyId = CompanyId from security.CoExternalCoAssoc where ExternalCompanyId = @ExternalCompanyId
+	end
 	-- get the existing row for DOWEventTypeId
-	select @DOWeventTypeId = DOWEventTypeId from schedule.ProductEventDOW 
-		where (ProductEventDOWID = isnull(@ProductEventDOWID,ProductEventDOWID) and ExternalProductEventDOWId = isnull(@ExternalProductEventDOWId, ExternalProductEventDOWId))
+	select @DOWeventTypeId = DOWEventTypeId from schedule.ProductEventDOW dow
+		join schedule.ProductEvent pe on dow.ProductEventId = pe.ProductEventId
+		where 
+			(ProductEventDOWID = @ProductEventDOWID) 
+			or 
+			(ExternalProductEventDOWId = @ExternalProductEventDOWId and pe.CompanyId = @CompanyId)
+
+	-- this is an external call get ProductEventDOWId
+	if @ExternalProductEventDOWId is not null and @ProductEventDOWId is null begin
+		select @ProductEventDOWId = ProductEventDOWId from schedule.ProductEventDOW pdow
+			join schedule.ProductEvent pe on pdow.ProductEventId = pe.ProductEventId
+		where ExternalProductEventDOWID = @ExternalProductEventDOWId
+			and pe.CompanyId = @CompanyId 
+	end
+
+	if @ProductEventDOWId is null
+		THROW 52254, 'Null ProductEventDOWId present after search using external Ids', 1; 
 
 	-- 1 is daily schedule set start and end to null
 	if @DOWeventTypeId = 1 begin
@@ -42,24 +60,19 @@ AS BEGIN TRY
 			,UTCScheduledStartingTime = NULL
 			,UTCScheduledEndingTime = NULL
 			,ScheduledEndingTime = null
-		where (ProductEventDOWID = isnull(@ProductEventDOWID,ProductEventDOWID) and ExternalProductEventDOWId = isnull(@ExternalProductEventDOWId, ExternalProductEventDOWId))
+		where ProductEventDOWID = @ProductEventDOWId
+
+		If @@ROWCOUNT = 0
+			throw 52255, 'Update of daily schedule failed', 1; 
 
 	end
 	else begin
 		delete from schedule.ProductEventDOW
-			where (ProductEventDOWID = isnull(@ProductEventDOWID,ProductEventDOWID) and ExternalProductEventDOWId = isnull(@ExternalProductEventDOWId, ExternalProductEventDOWId))
+			where ProductEventDOWID = @ProductEventDOWId
 
+		If @@ROWCOUNT = 0
+			throw 52256, 'Delete of daily schedule failed', 1; 
 	end
 
-	SELECT @Id
-END TRY
-BEGIN CATCH
-        -- Optionally log error here
-    IF ERROR_NUMBER() IN (2601, 2627) BEGIN
-		DECLARE @errMsg nvarchar(4000) = ERROR_MESSAGE();
-        THROW 52001, 'A package with that name already exists.', 1;
-    END
-    ELSE BEGIN
-        THROW;
-    END
-END CATCH
+	SELECT @ProductEventDOWId
+END

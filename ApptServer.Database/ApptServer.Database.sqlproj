@@ -180,5 +180,11 @@
     <Build Include="schedule\Stored Procedures\Package_SoftDelete.sql" />
     <Build Include="schedule\Stored Procedures\Package_Set.sql" />
     <Build Include="schedule\Stored Procedures\Package_Delete.sql" />
+    <Build Include="dbo\Tables\Industry.sql" />
+    <Build Include="Company\Tables\PolicyType.sql" />
+    <Build Include="Company\Tables\CompanyPolicy.sql" />
+    <Build Include="schedule\Stored Procedures\ProductEventDOW_Set_Safe.sql" />
+    <Build Include="schedule\Stored Procedures\ProductEventDOW_Delete_SAFE.sql" />
+    <Build Include="Company\Stored Procedures\CompanyPolicy_Set.sql" />
   </ItemGroup>
 </Project>

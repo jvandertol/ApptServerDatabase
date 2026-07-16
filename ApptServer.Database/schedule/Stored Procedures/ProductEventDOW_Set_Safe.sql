@@ -3,7 +3,7 @@
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE [schedule].[ProductEventDOW_Set]
+create PROCEDURE [schedule].[ProductEventDOW_Set_Safe]
 	@ProductEventDOWId bigint = null
 	,@ExternalProductEventDOWId bigint = null
 	,@DOW int
@@ -16,58 +16,51 @@ CREATE PROCEDURE [schedule].[ProductEventDOW_Set]
 	,@ExternalCompanyId bigint
 
 	-- Add the parameters for the stored procedure here
-AS BEGIN
+AS BEGIN TRY
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 	
-	if @ProductEventDOWId = -1
-		set @ProductEventDOWId = null
+	if (@ProductEventDOWId is null and @ExternalProductEventDOWId is null )
+		throw 71001, 'ProductEventDOWId or ExternalProductEventDOWId is required', 1;
 
-	if @ExternalProductEventDOWId = -1
-		set @ExternalProductEventDOWId = null
+	if (@ProductEventDOWId is null and @ExternalCompanyId is null )
+		throw 71001, 'ProductEventDOWId is required if @ExternalCompanyId is null ', 1;
 
-	if (@ProductEventDOWId is null and (@ExternalProductEventDOWId is null or @ExternalCompanyId is null))
-		throw 52250, 'ProductEventDOWId or ExternalProductEventDOWId and Ext. CompanyId are required', 1;
-
-	if (@ProductEventDOWId is not null and @ExternalCompanyId is not null)
-		throw 52251, 'ProductEventDOWId not allowed if @ExternalCompanyId is not null ', 1;
-
-	Declare @CompanyId bigint,
-		@msg varchar(250)
+	Declare @CompanyId bigint
 	-- this is an external call get CompanyId
 	if @ExternalCompanyId is not null and @ProductEventDOWId is null begin
 		select @CompanyId = CompanyId from security.CoExternalCoAssoc where ExternalCompanyId = @ExternalCompanyId
 	end
 
 	-- this is an external call get ProductEventDOWId
-	if @ExternalProductEventDOWId is not null begin
+	if @ExternalProductEventDOWId is not null and @ProductEventDOWId is null begin
 		select @ProductEventDOWId = ProductEventDOWId from schedule.ProductEventDOW pdow
 			join schedule.ProductEvent pe on pdow.ProductEventId = pe.ProductEventId
 		where ExternalProductEventDOWID = @ExternalProductEventDOWId
 			and pe.CompanyId = @CompanyId 
+
+	if (@ProductEventDOWId is null )
+		throw 71001, 'Unable to map External call to local call for producteventdow', 1;
+
 	end
 
-	-- Get ProductEventId
-	declare @ProductEventId bigint
-	,@TimeZone NVARCHAR(50)
-	,@UTCDateTime datetime2(3)
-	select 
-		@ProductEventId = pe.ProductEventId
-		,@TimeZone = isnull(c.timezone,'Pacific Standard Time')
-		from schedule.ProductEvent pe
-		join Companies c on pe.CompanyId = c.CompanyId
-	where c.CompanyId =  @CompanyId
-
-	select @ProductEventDOWId = ProductEventDOWId from schedule.ProductEventDOW 
-		where ExternalProductEventDOWID = @ExternalProductEventDOWID and ProductEventId = @ProductEventId
-
-	--select @ProductEventDOWId
-	
-	-- this is an insert
 	if @ProductEventDOWId is null  begin
 
-		--select @ProductEventId ProductEventId
+		declare @ProductEventId bigint
+		,@TimeZone NVARCHAR(50)
+		,@UTCDateTime datetime2(3)
+
+		-- join to security.CoExternalCoAssoc unnecessary after ExternalCompanyId added to Company table
+		select 
+			@ProductEventId = pe.ProductEventId
+			,@TimeZone = isnull(c.timezone,'Pacific Standard Time')
+			from ProductEvent pe
+			join security.CoExternalCoAssoc ceca on pe.companyid = ceca.CompanyId
+			join Companies c on pe.CompanyId = c.CompanyId
+		where ceca.ExternalCompanyId =  @ExternalCompanyId
+
+		select top 1 * from schedule.ProductEventDOW 
 
 		insert into schedule.ProductEventDOW (
 			ExternalProductEventDOWId 
@@ -100,15 +93,8 @@ AS BEGIN
 			
 	
 		select @ProductEventDOWId = SCOPE_IDENTITY()
-		if @ProductEventDOWId is null begin
-			SET @msg  = 'Insert action failed for event ' + ISNULL(@DOWeventDescr, '<unknown>');
-			throw 52252, @msg , 1;
-		end
-
 	end
 	else begin
-		--select * from schedule.ProductEventDOW where ProductEventDOWId = @ProductEventDOWId
-	
 		update schedule.ProductEventDOW
 			set 
 			DOW = isnull(@DOW,DOW)
@@ -122,15 +108,20 @@ AS BEGIN
 			,DOWeventDescr = isnull(@DOWeventDescr,DOWeventDescr)
 			,UpdateDtTm = GETUTCDATE()
 			,UpdatedById = 1
-		where ProductEventDOWId = @ProductEventDOWId
 
-		if @@ROWCOUNT = 0 begin
-		SET @msg  = 'Update action failed for event ' + ISNULL(@DOWeventDescr, '<unknown>');
-		throw 52254, @msg , 1;
+		where (ProductEventDOWID = isnull(@ProductEventDOWID,ProductEventDOWID) and ExternalProductEventDOWId = isnull(@ExternalProductEventDOWId, ExternalProductEventDOWId))
+
 	end
 
-end
-
-
-	SELECT @ProductEventDOWId
-END
+	SELECT isnull(@ProductEventDOWId,@ExternalProductEventDOWId)
+END TRY
+BEGIN CATCH
+        -- Optionally log error here
+  --  IF ERROR_NUMBER() IN (2601, 2627) BEGIN
+		--DECLARE @errMsg nvarchar(4000) = ERROR_MESSAGE();
+  --      THROW 52001, 'A package with that name already exists.', 1;
+  --  END
+  --  ELSE BEGIN
+        THROW;
+  --  END
+END CATCH
