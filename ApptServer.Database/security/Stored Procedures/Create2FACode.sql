@@ -67,7 +67,7 @@ AS BEGIN TRY
 		--	where Email = @AuthContactValue 
 		declare @namesmatch bit
 		select @UserId = u.UserId, @namesmatch= isnull(u2.UserId, 0)  from security.Users u 
-					join security.CompanyUserAssoc cua on u.UserId = cua.UserId and cua.Companyid = 1
+					join security.CompanyUserAssoc cua on u.UserId = cua.UserId and cua.Companyid = @CompanyId
 					left join 
 					(
 					select userid from security.users u1 where u1.FirstName = @FirstName and u1.LastName = @LastName
@@ -115,7 +115,9 @@ AS BEGIN TRY
 		,1
 		,@MinutesToExpire
 		)
-	select @ResultCode = 2
+	--select @ResultCode = 2
+	-- mod 2026-07-30 per chatgpt logic error
+	set @ResultCode = case when @UserId is null then 3 else 2 end
 
 END TRY
 BEGIN CATCH

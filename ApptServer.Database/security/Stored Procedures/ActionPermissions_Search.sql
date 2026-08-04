@@ -1,15 +1,18 @@
 ﻿-- =============================================
--- Author:			JTV
--- Create date:		2026-03-27
--- Description:		returns a list of claims in the form of:
--- Scope:			(either 1 or 2) for Actor or Company enumeration
--- ClaimTypeKey:	such as acc-perm of fld-perm
--- RoleName:		Customer, Admin, etc
--- DomainName:		Domain the claim operates on
--- ClaimValue:		Combination of short domain:claim value
--- Description:		The claim value is referenced by the object code where permissions are required.  if the claimvalue is found the action is allowed.
---					The scope is used to identify who the claim is acting on.  1 = Actor or the current user, 2 is a company level claim.  This permission is granted
---					when a company has selected a particular option or feature as part of their account subscription
+-- Author:				JTV
+-- Create date:			2026-03-27
+-- Description:			returns a list of claims for the passed CompanyId or ExternalCompanyId.  As it is a search it contains the standard search params
+-- @PageNumber:			Current page number
+-- @PageId:				Current page Id
+-- @Forward:			Direction
+-- @PageSize:			number of rows to return
+-- @MaxPages:			Combination of short domain:claim value
+-- @CompanyId:			The CompanyId of the logged in user
+-- @ExternalCompanyId:	The externalCompanyId of the company that is to be impersonated.  Only populated when called by an impersonating web service
+-- @Roles:				A table value param as multiple roles may be supported.
+-- Description:			The sp runs off the security.PermissionAssoc table which is a domain permission table.  It also identifies if the permission as associated
+--						with a companyOption  IsOptionControlled.  The tables ultimately join up to a role.  The data returned is then compared to the requested claims
+--						in the claim behavior pipeline
 -- =============================================
 
 CREATE PROCEDURE [security].[ActionPermissions_Search]
@@ -19,14 +22,15 @@ CREATE PROCEDURE [security].[ActionPermissions_Search]
 @PageSize int =20,
 @MaxPages int =3,
 @CompanyId bigint,
+@ExternalCompanyId bigint = null,
 @Roles security.RoleList READONLY
 
 AS BEGIN
 /*
 declare @r1 security.RoleList
-insert into @r1 values ('CUSTOMER')
+insert into @r1 values ('SysAdminAPI')
 
-exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
+exec [security].[ActionPermissions_Search]  0,1,1,20,3,2,NULL,@r1
 
 */
 
@@ -35,6 +39,17 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
 	SET NOCOUNT ON;
 
 	-- similary to AllowedUrls_Search - the paged list is a stub as the search method expects it
+
+	-- if an @ExternalCompanyId is passed replace @CompanyId with the company associated with that external id.  This is so that in the case of impersonation options
+	-- a calling web service can only impersonate permissions granted to the user
+	declare @EffectiveCompanyId bigint
+	SELECT @EffectiveCompanyId = CASE WHEN @ExternalCompanyId IS NULL THEN 
+			@CompanyId
+        ELSE ( 
+			SELECT CompanyId FROM security.CoExternalCoAssoc
+				WHERE ExternalCompanyId = @ExternalCompanyId
+        )
+    END;
 
 	-- Search requires a paging table to be returned
 	select 1 PageNumber, 1 FirstId, 1 LastId
@@ -72,7 +87,7 @@ exec [security].[ActionPermissions_Search]  0,1,1,20,3,1,@r1
                     JOIN security.OptionRightsAssoc ora
                         ON loa.OptionId = ora.OptionId
                 WHERE
-                    loa.CompanyId = @CompanyId
+                    loa.CompanyId = @EffectiveCompanyId
                     AND ora.PermissionAssocId = pa.PermissionAssocId
 					AND pa.IsOptionControlled = 1
             )

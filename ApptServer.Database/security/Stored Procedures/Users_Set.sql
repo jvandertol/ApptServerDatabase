@@ -1,5 +1,6 @@
 ﻿CREATE PROCEDURE [security].[Users_Set]
-	@UserId	bigint	= NULL
+   @CompanyUserAssocId bigint = null
+--	@UserId	bigint	= NULL
 	,@FirstName	varchar(250)= NULL
 	,@LastName	varchar(250)= NULL
 	,@Address	varchar(250)= NULL
@@ -28,7 +29,7 @@
 	,@AllowedCaller varchar(25) = NULL
 AS
 BEGIN
-BEGIN TRY
+
 
 /*
 	exec users_set @Email = 'bo@boo.com', @Origin = 'https://localhost:7222' -- duplicate user by email
@@ -38,59 +39,62 @@ BEGIN TRY
 	
 */
 
-	declare @updated bit = 0
-	,@ActualUserId bigint
-
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
+
+	declare @UserId bigint
 
 	if @CompanyId is null begin
 		select @CompanyId = CompanyId from security.AllowedURLs where url = @Origin
 	end
 
+	-- need to add sql error
+	if @CompanyId is null begin
+			throw 50001, 'SQLERROR-50001 - Company could not be determined.', 1;
+	end
+
+	-- check if a user with a matching email exists
+	if(@CompanyUserAssocId is null) begin
+		select top 1 @UserId = u.UserId from security.CompanyUserAssoc u
+				where u.Email = @Email
+		-- support phone later
+		--			   or (cua.PhoneNumber = @MobilePhone and @MobilePhone is not null);
+	end
+	else begin
+		select @UserId = u.UserId from security.CompanyUserAssoc u
+				where CompanyUserAssocId = @CompanyUserAssocId
+	end
+
+	select @CompanyUserAssocId = CompanyUserAssocId  from security.CompanyUserAssoc where UserId = @UserId and CompanyId = @CompanyId and @CompanyUserAssocId is null
+
+
 	if(@UserId is null) begin
+
 		-- Insert statements for procedure here
 		INSERT INTO [security].[users] (
 			FirstName, LastName, [Address], [Address2], [City], [Region], [PoCode], CreatedAt, IsDeleted
 		)
-		SELECT
-			v.FirstName,
-			v.LastName,
-			v.Address,
-			v.Address2,
-			v.City,
-			v.Region,
-			v.PoCode,
+		values (
+			@FirstName,
+			@LastName,
+			@Address,
+			@Address2,
+			@City,
+			@Region,
+			@PoCode,
 			GETUTCDATE(),
 			0
-		FROM (
-			SELECT
-				@FirstName AS FirstName,
-				@LastName AS LastName,
-				@Address AS Address,
-				@Address2 AS Address2,
-				@City AS City,
-				@Region AS Region,
-				@PoCode AS PoCode
-		) AS v
-		LEFT JOIN [security].[users] u
-		LEFT JOIN security.CompanyUserAssoc cua on u.UserId = cua.UserId
-			ON cua.CompanyId = @CompanyId and cua.Email = @Email OR (cua.PhoneNumber = @MobilePhone and @MobilePhone is not null)
-		WHERE u.UserId IS NULL;
+		);
+		
+		select @UserId = SCOPE_IDENTITY()
+	end
 
-
-		--select @UserId = SCOPE_IDENTITY()
-		select @ActualUserId = SCOPE_IDENTITY()
-		IF @ActualUserId IS NULL
-		BEGIN
-			THROW 50001, 'SQLERROR-50001 - Insert failed: a user with this email or phone number already exists.', 1;
-		END
-
+	if(@CompanyUserAssocId is null ) begin
 		insert into security.CompanyUserAssoc values (
-			@ActualUserId 
+			@UserId 
 			,@CompanyId
-			,1 
+			,1			-- IsPrimary
 			,case when @UserName is null then @Email end
 			,@Email
 			,@EmailConfirmed
@@ -104,11 +108,11 @@ BEGIN TRY
 			,@IsDeleted
 		)
 
-		select @UserId = SCOPE_IDENTITY()
+		select @CompanyUserAssocId = SCOPE_IDENTITY()
 
 		-- add role
 		insert into security.UserRolesAssoc
-		  select roleid, @Userid from security.Roles where RoleName = @RoleName
+		  select roleid, @CompanyUserAssocId from security.Roles where RoleName = @RoleName
 
 	end
 	else begin
@@ -125,7 +129,7 @@ BEGIN TRY
 			,IsDeleted			= case when @IsDeleted is null then u.IsDeleted else @IsDeleted end
 		from security.users u
 			join security.companyuserassoc cua on u.UserId = cua.UserId
-		where cua.CompanyUserAssocId = @UserId
+		where cua.CompanyUserAssocId = @CompanyUserAssocId
 		
 		IF @@ROWCOUNT = 0
 		BEGIN
@@ -142,31 +146,11 @@ BEGIN TRY
 			,LockoutEnabled				= case when @LockoutEnabled is null then LockoutEnabled else @LockoutEnabled end
 			,AccessFailedCount			= case when @AccessFailedCount is null then AccessFailedCount else @AccessFailedCount end
 			,IsDeleted					= case when @IsDeleted is null then IsDeleted else @IsDeleted end
-		where CompanyUserAssocId = @UserId
+		where CompanyUserAssocId = @CompanyUserAssocId and CompanyId = @CompanyId
 
 	end
 
-	select @UserId
+	select @CompanyUserAssocId
 
-END TRY
-BEGIN CATCH
- DECLARE @ErrorMessage NVARCHAR(4000);
-    DECLARE @ErrorSeverity INT;
-    DECLARE @ErrorState INT;
 
-    -- Get the error details
-    SELECT 
-        @ErrorMessage = ERROR_MESSAGE(),
-        @ErrorSeverity = ERROR_SEVERITY(),
-        @ErrorState = ERROR_STATE();
-
-    -- Rollback the transaction if it's still open
-    IF @@TRANCOUNT > 0
-    BEGIN
-        ROLLBACK TRANSACTION;
-    END
-
-    -- Log the error or raise it
-    RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
-END CATCH
 END

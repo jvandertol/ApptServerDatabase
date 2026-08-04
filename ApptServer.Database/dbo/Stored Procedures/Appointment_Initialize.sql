@@ -66,7 +66,7 @@ BEGIN
 			C.Criteria.value('@vehicletypecd', 'varchar(25)') as VehicleTypeCd
 		from schedule.Package p
 			cross apply p.PackageXml.nodes('/asonlinepkgcriteria/criterion') C(Criteria)
-		where p.CompanyId = 1
+		where p.CompanyId = @CompanyId
 			and p.IsDeleted = 0
 		order by FuelTypeCd, VehicleTypeCd
 

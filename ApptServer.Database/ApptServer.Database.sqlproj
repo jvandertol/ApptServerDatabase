@@ -186,5 +186,6 @@
     <Build Include="schedule\Stored Procedures\ProductEventDOW_Set_Safe.sql" />
     <Build Include="schedule\Stored Procedures\ProductEventDOW_Delete_SAFE.sql" />
     <Build Include="Company\Stored Procedures\CompanyPolicy_Set.sql" />
+    <Build Include="Company\Stored Procedures\CompanyPolicy_Delete.sql" />
   </ItemGroup>
 </Project>
